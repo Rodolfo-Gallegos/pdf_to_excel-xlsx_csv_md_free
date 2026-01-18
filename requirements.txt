@@ -1,0 +1,6 @@
+pdfplumber
+pandas
+google-genai
+python-dotenv
+openpyxl
+Pillow

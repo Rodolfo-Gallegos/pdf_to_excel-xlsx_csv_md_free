@@ -1,0 +1,21 @@
+# Environment variables
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+
+# Tables
+tables.pdf
+
+# Project outputs
+extracted_tables/
+extracted_tables.xlsx
+tablas_imagenes.xlsx
+poster_table.xlsx
+
+# OS
+.DS_Store
+Thumbs.db
