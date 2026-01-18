@@ -31,10 +31,27 @@ This allows you to leverage AI for further tasks such as:
 - Performing **deep data cleaning** or advanced analysis.
 - Reformatting results into custom JSON or code structures.
 
-## 🎥 Video Tutorial
+## 🧠 AI Customization (Prompt Tweaking)
+
+You can customize how the AI analyzes each page by modifying the **system prompt**. This is useful if you want to extract non-table text, request specialized formatting (like **LaTeX**), or apply custom logic.
+
+The prompt is located in:
+
+- **CLI**: `pdf_to_xlsx.py` inside the `process_page_images()` function.
+- **GUI**: `gui_app.py` inside the `_extract_from_page()` method.
+
+### Current Prompt
+>
+> _"Analyze this page and extract ALL tables you see. Even if the table looks like a screenshot or an embedded image, extract it. Return results strictly in Markdown format. Do not include any introductory text, titles outside the table, or comments. If no tables are found, return an empty string."_
+
+By modifying these lines, you can tell Gemini to:
+
+- _"Extract all headers and the main table..."_
+- _"Format the result as a LaTeX longtable..."_
+- _"Summarize the text above the table and then extract the data..."_
 
 [![Video Tutorial](https://img.shields.io/badge/YouTube-Video%20Tutorial-red?style=for-the-badge&logo=youtube)](https://www.youtube.com/watch?v=tu_video_id_aqui)
-*In this video, I explain how to set up the repository and use both the GUI and CLI versions.*
+_In this video, I explain how to set up the repository and use both the GUI and CLI versions._
 
 ---
 
@@ -44,7 +61,7 @@ This allows you to leverage AI for further tasks such as:
 
 1. Download or clone this repository.
 2. Double-click **`setup_windows.bat`**.
-   - *This will automatically install Python (if missing), setup dependencies, and launch the app.*
+   - _This will automatically install Python (if missing), setup dependencies, and launch the app._
 
 ### For Linux (Ubuntu/Debian)
 
@@ -111,4 +128,4 @@ python3 pdf_to_xlsx.py document.pdf --clean --md --csv -o final_results.xlsx
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
-*Bilingual Documentation: [English](README.md) | [Spanish](README_ES.md)*
+_Bilingual Documentation: [English](README.md) | [Spanish](README_ES.md)_

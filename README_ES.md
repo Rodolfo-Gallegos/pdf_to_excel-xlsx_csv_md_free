@@ -31,10 +31,27 @@ Esto permite aprovechar la IA para tareas adicionales como:
 - Realizar una **limpieza profunda** o análisis de datos avanzado.
 - Reformatear los resultados en estructuras personalizadas de JSON o código.
 
-## 🎥 Video Tutorial
+## 🧠 Personalización de IA (Ajuste del Prompt)
+
+Puedes personalizar cómo la IA analiza cada página modificando el **prompt del sistema**. Esto es útil si deseas extraer texto que no sean tablas, solicitar formatos especializados (como **LaTeX**) o aplicar lógica personalizada.
+
+El prompt se encuentra en:
+
+- **CLI**: `pdf_to_xlsx.py` dentro de la función `process_page_images()`.
+- **GUI**: `gui_app.py` dentro del método `_extract_from_page()`.
+
+### Prompt Actual
+>
+> _"Analyze this page and extract ALL tables you see. Even if the table looks like a screenshot or an embedded image, extract it. Return results strictly in Markdown format. Do not include any introductory text, titles outside the table, or comments. If no tables are found, return an empty string."_
+
+Al modificar estas líneas, puedes decirle a Gemini:
+
+- _"Extrae todos los encabezados y la tabla principal..."_
+- _"Formatea el resultado como una tabla larga (longtable) de LaTeX..."_
+- _"Resume el texto sobre la tabla y luego extrae los datos..."_
 
 [![Video Tutorial](https://img.shields.io/badge/YouTube-Video%20Tutorial-red?style=for-the-badge&logo=youtube)](https://www.youtube.com/watch?v=tu_video_id_aqui)
-*En este video explico cómo configurar el repositorio y cómo usar tanto la versión gráfica como la de terminal.*
+_En este video explico cómo configurar el repositorio y cómo usar tanto la versión gráfica como la de terminal._
 
 ---
 
@@ -44,7 +61,7 @@ Esto permite aprovechar la IA para tareas adicionales como:
 
 1. Descarga o clona este repositorio.
 2. Haz doble clic en **`setup_windows.bat`**.
-   - *Esto instalará Python automáticamente (si falta), configurará las dependencias e iniciará la app.*
+   - _Esto instalará Python automáticamente (si falta), configurará las dependencias e iniciará la app._
 
 ### Para Linux (Ubuntu/Debian)
 
@@ -111,4 +128,4 @@ python3 pdf_to_xlsx.py documento.pdf --clean --md --csv -o resultados_finales.xl
 Este proyecto está bajo la Licencia MIT - mira el archivo [LICENSE](LICENSE) para más detalles.
 
 ---
-*Documentación Bilingüe: [Inglés](README.md) | [Español](README_ES.md)*
+_Documentación Bilingüe: [Inglés](README.md) | [Español](README_ES.md)_
