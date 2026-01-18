@@ -47,6 +47,7 @@ class PDFToXLSXGUI:
         self.save_md = tk.BooleanVar(value=False)
         self.save_csv = tk.BooleanVar(value=False)
         self.clean_data = tk.BooleanVar(value=True)
+        self._has_error = False  # Flag to track if errors occurred during processing
 
         # Load Icons
         self.icons = {}
@@ -256,6 +257,13 @@ class PDFToXLSXGUI:
         if not self.api_key.get().strip():
             messagebox.showerror("Error", "Gemini API Key is required.")
             return
+        
+        # Check API Key length
+        api_key_val = self.api_key.get().strip()
+        if len(api_key_val) != 39:
+            messagebox.showwarning("Error", "Incorrect API Key length. The key must be 39 characters long.\n\nLongitud de API incorrecta. La clave debe tener 39 caracteres.")
+            return
+
         if not self.pdf_files:
             messagebox.showerror("Error", "Please add at least one PDF file.")
             return
@@ -281,6 +289,7 @@ class PDFToXLSXGUI:
     def _process_logic(self):
         key = self.api_key.get().strip()
         out_dir = self.output_dir.get().strip()
+        self._has_error = False # Reset error flag
         
         try:
             client = genai.Client(api_key=key)
@@ -354,19 +363,32 @@ class PDFToXLSXGUI:
                 
                 except Exception as e:
                     self._log(f"ERROR: {file_name} -> {e}")
+                    if "400" in str(e) or "429" in str(e):
+                        raise e # Re-raise to show the error window and stop completely
                 
                 self.root.after(0, self._update_progress, i + 1)
 
             if writer:
                 writer.close()
-                self._log(f"Results consolidated in EXCEL: {excel_filename}")
+                if not self._has_error:
+                    self._log(f"Results consolidated in EXCEL: {excel_filename}")
 
-            self._log("SYSTEM: All tasks completed.")
-            self.root.after(0, lambda: messagebox.showinfo("Process Finished", "The extraction process has completed successfully!"))
+            if not self._has_error:
+                self._log("SYSTEM: All tasks completed. / Todas las tareas completadas.")
+                self.root.after(0, lambda: messagebox.showinfo("Process Finished / Proceso Finalizado", "The extraction process has completed successfully!\n\n¡El proceso de extracción ha finalizado con éxito!"))
+            else:
+                self._log("SYSTEM: Process finished with errors. / Proceso finalizado con errores.")
             
         except Exception as e:
             self._log(f"CRITICAL ERROR: {e}")
-            messagebox.showerror("System Error", f"The process encountered a fatal error: {e}")
+            if "400" in str(e):
+                msg = "The API key entered is incorrect (Code 400). Please verify it and try again.\n\nLa API Key ingresada no es correcta (Código 400). Por favor, verifíquela e inténtelo de nuevo."
+                messagebox.showerror("API Key Error / Error de API Key", msg)
+            elif "429" in str(e):
+                msg = "The daily API limit has been exceeded (Code 429).\n\nSe ha excedido el límite de la API diario (Código 429)."
+                messagebox.showerror("Quota Error / Error de Cuota", msg)
+            else:
+                messagebox.showerror("System Error / Error del Sistema", f"The process encountered a fatal error / El proceso encontró un error fatal: {e}")
         
         self.root.after(0, lambda: self.start_btn.config(state="normal"))
 
@@ -385,7 +407,7 @@ class PDFToXLSXGUI:
             If no tables are found, return an empty string.
             """
             
-            max_retries = 3
+            max_retries = 1
             md_text = ""
             for attempt in range(max_retries):
                 try:
@@ -397,8 +419,17 @@ class PDFToXLSXGUI:
                         md_text = response.text
                     break
                 except Exception as e:
-                    if "429" in str(e) and attempt < max_retries - 1:
-                        time.sleep((attempt + 1) * 10)
+                    if "400" in str(e):
+                        self._log(f"      ! Incorrect API Key (Code 400) / API Key incorrecta (Código 400).")
+                        self._has_error = True
+                        raise e # Re-raise to stop the loop for this file or process
+                    elif "429" in str(e):
+                        if attempt < max_retries - 1:
+                            time.sleep((attempt + 1) * 10)
+                        else:
+                            self._log(f"      ! Daily quota exceeded (Code 429) / Límite diario excedido (Código 429).")
+                            self._has_error = True
+                            raise e
                     else:
                         raise e
             
@@ -408,6 +439,9 @@ class PDFToXLSXGUI:
                 if not df.empty:
                     return [{"df": df, "md": clean_md}]
         except Exception as e:
+            if "400" in str(e) or "429" in str(e):
+                # Propagate fatal API errors
+                raise e
             self._log(f"      ! Page {page.page_number} error: {e}")
         return []
 
