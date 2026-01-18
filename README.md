@@ -1,6 +1,6 @@
 # PDF to EXCEL/CSV/MD AI Extractor
 
-A robust AI-powered tool that extracts tables from PDF files by analyzing pages as images using the Gemini 3 Flash Preview model. Captures complex visual layouts that traditional text-based extractors fail to process.
+An AI-powered tool that extracts tables from PDF files by analyzing pages as images using the Gemini 3 Flash Preview model. Captures complex visual layouts that traditional text-based extractors fail to process.
 
 ## 📊 Result Showcase
 
@@ -11,7 +11,7 @@ A robust AI-powered tool that extracts tables from PDF files by analyzing pages 
 | ![Original PDF](screenshots/pdf_tables.png) | ![Excel Output](screenshots/xlsx_table.png) | ![Markdown Output](screenshots/markdown_table.png) | ![CSV Output](screenshots/csv_table.png) |
 
 > [!TIP]
-> **From visual chaos to structured data in seconds.** Perfect for scanned documents, insurance quotes, and complex reports.
+> **From pdf image to structured data in seconds.** Perfect for scanned documents and complex reports.
 
 ## ✨ Features
 

@@ -1,6 +1,6 @@
 # Extractor de PDF a EXCEL/CSV/MD con IA
 
-Una herramienta robusta potenciada por IA que extrae tablas de archivos PDF analizando las páginas como imágenes mediante el modelo Gemini 3 Flash Preview. Captura diseños visuales complejos que los extractores basados en texto tradicional no logran procesar.
+Una herramienta potenciada por IA que extrae tablas de archivos PDF analizando las páginas como imágenes mediante el modelo Gemini 3 Flash Preview. Captura diseños visuales complejos que los extractores basados en texto tradicional no logran procesar.
 
 ## 📊 Resumen de Resultados
 
@@ -11,7 +11,7 @@ Una herramienta robusta potenciada por IA que extrae tablas de archivos PDF anal
 | ![PDF Original](screenshots/pdf_tables.png) | ![Salida Excel](screenshots/xlsx_table.png) | ![Salida Markdown](screenshots/markdown_table.png) | ![Salida CSV](screenshots/csv_table.png) |
 
 > [!TIP]
-> **Del caos visual a datos estructurados en segundos.** Ideal para documentos escaneados, cotizaciones de seguros y reportes complejos.
+> **De imagen en pdf a datos estructurados en segundos.** Ideal para documentos escaneados y reportes complejos.
 
 ## ✨ Características
 
@@ -90,7 +90,7 @@ python3 gui_app.py
 Ejecuta el script directamente para procesamiento rápido o automatización:
 
 ```bash
-python3 pdf_to_xlsx.py documento.pdf --clean --md --csv -o resultados_finales.xlsx
+python3 pdf_to_xlsx.py documento.pdf --clean --md --csv -o tablas_excel.xlsx
 ```
 
 - `--clean`: Normaliza los datos (quita '$', ',', etc.).
