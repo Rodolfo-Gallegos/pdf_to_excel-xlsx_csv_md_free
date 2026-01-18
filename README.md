@@ -2,6 +2,8 @@
 
 An AI-powered tool that extracts tables from PDF files by analyzing pages as images using the Gemini 3 Flash Preview model. Captures complex visual layouts that traditional text-based extractors fail to process.
 
+_Documentation: [English](README.md) | [Español](README_ES.md)_
+
 ## 📊 Result Showcase
 
 ### Input vs. Output
@@ -128,4 +130,4 @@ python3 pdf_to_xlsx.py document.pdf --clean --md --csv -o final_results.xlsx
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
-_Documentation: [English](README.md) | [Español](README_ES.md)_
+

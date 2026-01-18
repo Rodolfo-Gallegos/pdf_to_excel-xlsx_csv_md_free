@@ -2,6 +2,8 @@
 
 Una herramienta potenciada por IA que extrae tablas de archivos PDF analizando las páginas como imágenes mediante el modelo Gemini 3 Flash Preview. Captura diseños visuales complejos que los extractores basados en texto tradicional no logran procesar.
 
+_Documentación: [English](README.md) | [Español](README_ES.md)_
+
 ## 📊 Resumen de Resultados
 
 ### PDF Origen vs. Salida
@@ -128,4 +130,4 @@ python3 pdf_to_xlsx.py documento.pdf --clean --md --csv -o tablas_excel.xlsx
 Este proyecto está bajo la Licencia MIT - mira el archivo [LICENSE](LICENSE) para más detalles.
 
 ---
-_Documentación: [English](README.md) | [Español](README_ES.md)_
+
