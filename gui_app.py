@@ -15,7 +15,126 @@ from dotenv import load_dotenv, set_key
 from PIL import Image, ImageTk
 
 # Metadata for versioning/help
-VERSION = "1.3.0"
+VERSION = "1.4.0"
+
+DEFAULT_PROMPT = """
+Analyze this page and extract ALL tables you see.
+Even if the table looks like a screenshot or an embedded image, extract it.
+Return results strictly in Markdown format.
+Do not include any introductory text, titles outside the table, or comments.
+If no tables are found, return an empty string.
+"""
+
+TEXTS = {
+    "EN": {
+        "title": "PDF to EXCEL/CSV/MD AI Extractor",
+        "config_section": " 1. CONFIGURATION ",
+        "api_key": "API Key:",
+        "save_key": "Save Key",
+        "get_key": "Get your free API key at Google AI Studio",
+        "pdf_selection": " 2. PDF SELECTION ",
+        "select_files": "Select files to process:",
+        "add_files": "+ Add Files",
+        "clear": "🗑 Clear",
+        "output_config": " 3. OUTPUT CONFIGURATION ",
+        "output_folder": "Output Folder:",
+        "browse": "Browse...",
+        "excel_name": "Excel Name:",
+        "csv_name": "CSV Name:",
+        "md_name": "MD Name:",
+        "options_section": " 4. OPTIONS ",
+        "opt_excel": "Excel (.xlsx)",
+        "opt_md": "Markdown (.md)",
+        "opt_csv": "CSV (.csv)",
+        "opt_normalize": "Normalize Data",
+        "start_btn": " START EXTRACTION ",
+        "status_log": " STATUS LOG ",
+        "edit_prompt": "Edit Prompt",
+        "ilovepdf": "Other PDF tools (iLovePDF)",
+        "language": "Language:",
+        "save": "Save",
+        "reset": "Reset",
+        "cancel": "Cancel",
+        "prompt_editor_title": "Prompt Editor",
+        "success": "Success",
+        "warning": "Warning",
+        "error": "Error",
+        "key_saved": "API Key saved to api_key.env",
+        "no_key": "Gemini API Key is required.",
+        "key_length": "Incorrect API Key length. The key must be 39 characters long.",
+        "no_files": "Please add at least one PDF file.",
+        "process_finished": "Process Finished",
+        "process_success": "The extraction process has completed successfully!",
+        "process_error": "Process finished with errors.",
+        "all_tasks_done": "SYSTEM: All tasks completed.",
+        "analyzing_page": "    - Analyzing page {}...",
+        "working_on": "Working on: {}",
+        "done": "DONE: {}",
+        "skip": "SKIP: No tables in {}",
+        "saved_md": "  + Saved MD: {}",
+        "saved_csv": "  + Saved CSV: {}",
+        "files_added": "Added {} new files.",
+        "files_cleared": "File selection cleared.",
+        "output_path_set": "Output path: {}",
+        "fatal_error": "The process encountered a fatal error",
+        "quota_error": "The daily API limit has been exceeded (Code 429).",
+        "api_error": "The API key entered is incorrect (Code 400). Please verify it and try again."
+    },
+    "ES": {
+        "title": "Extractor de Tablas PDF con IA",
+        "config_section": " 1. CONFIGURACIÓN ",
+        "api_key": "Clave API:",
+        "save_key": "Guardar",
+        "get_key": "Obtén tu clave API gratis en Google AI Studio",
+        "pdf_selection": " 2. SELECCIÓN DE PDF ",
+        "select_files": "Selecciona archivos para procesar:",
+        "add_files": "+ Añadir Archivos",
+        "clear": "🗑 Limpiar",
+        "output_config": " 3. CONFIGURACIÓN DE SALIDA ",
+        "output_folder": "Carpeta de Salida:",
+        "browse": "Buscar...",
+        "excel_name": "Nombre Excel:",
+        "csv_name": "Nombre CSV:",
+        "md_name": "Nombre MD:",
+        "options_section": " 4. OPCIONES ",
+        "opt_excel": "Excel (.xlsx)",
+        "opt_md": "Markdown (.md)",
+        "opt_csv": "CSV (.csv)",
+        "opt_normalize": "Normalizar Datos",
+        "start_btn": " INICIAR EXTRACCIÓN ",
+        "status_log": " REGISTRO DE ESTADO ",
+        "edit_prompt": "Editar Prompt",
+        "ilovepdf": "Otras herramientas PDF (iLovePDF)",
+        "language": "Idioma:",
+        "save": "Guardar",
+        "reset": "Reiniciar",
+        "cancel": "Cancelar",
+        "prompt_editor_title": "Editor de Prompt",
+        "success": "Éxito",
+        "warning": "Advertencia",
+        "error": "Error",
+        "key_saved": "Clave API guardada en api_key.env",
+        "no_key": "Se requiere la clave API de Gemini.",
+        "key_length": "Longitud de API incorrecta. La clave debe tener 39 caracteres.",
+        "no_files": "Por favor, añade al menos un archivo PDF.",
+        "process_finished": "Proceso Finalizado",
+        "process_success": "¡El proceso de extracción ha finalizado con éxito!",
+        "process_error": "Proceso finalizado con errores.",
+        "all_tasks_done": "SISTEMA: Todas las tareas completadas.",
+        "analyzing_page": "    - Analizando página {}...",
+        "working_on": "Trabajando en: {}",
+        "done": "LISTO: {}",
+        "skip": "OMITIR: No hay tablas en {}",
+        "saved_md": "  + MD Guardado: {}",
+        "saved_csv": "  + CSV Guardado: {}",
+        "files_added": "Añadidos {} nuevos archivos.",
+        "files_cleared": "Selección de archivos limpiada.",
+        "output_path_set": "Ruta de salida: {}",
+        "fatal_error": "El proceso encontró un error fatal",
+        "quota_error": "Se ha excedido el límite de la API diario (Código 429).",
+        "api_error": "La clave API ingresada no es correcta (Código 400). Por favor, verifíquela e inténtelo de nuevo."
+    }
+}
 
 class PDFToXLSXGUI:
     def __init__(self, root):
@@ -48,6 +167,11 @@ class PDFToXLSXGUI:
         self.save_csv = tk.BooleanVar(value=False)
         self.clean_data = tk.BooleanVar(value=True)
         self._has_error = False  # Flag to track if errors occurred during processing
+        
+        # New State Variables
+        self.lang = "ES" # Default to Spanish based on user request context
+        self.current_prompt = DEFAULT_PROMPT.strip()
+        self.ui_elements = {} # To hold references to widgets for language updates
 
         # Load Icons
         self.icons = {}
@@ -90,64 +214,94 @@ class PDFToXLSXGUI:
         main_container = ttk.Frame(self.root, padding=20)
         main_container.pack(fill="both", expand=True)
 
-        # Header (Updated as per user preference)
-        header_label = ttk.Label(main_container, text="PDF to EXCEL/CSV/MD AI Extractor", font=("Segoe UI", 18, "bold"), foreground="#0078D4")
-        header_label.pack(pady=(0, 20))
+        # Header
+        self.ui_elements["title"] = ttk.Label(main_container, text=TEXTS[self.lang]["title"], font=("Segoe UI", 18, "bold"), foreground="#0078D4")
+        self.ui_elements["title"].pack(pady=(0, 10))
 
-        # 1. API Key Section
-        api_frame = ttk.LabelFrame(main_container, text=" 1. CONFIGURATION ", padding=15)
-        api_frame.pack(fill="x", pady=5)
+        # 1. CONFIGURATION & SETTINGS
+        config_frame = ttk.LabelFrame(main_container, text=TEXTS[self.lang]["config_section"], padding=15)
+        config_frame.pack(fill="x", pady=5)
+        self.ui_elements["config_section"] = config_frame
         
-        api_top = ttk.Frame(api_frame)
-        api_top.pack(fill="x", expand=True)
+        # API Key Row
+        api_row = ttk.Frame(config_frame)
+        api_row.pack(fill="x", expand=True)
         
-        ttk.Label(api_top, text="API Key:").pack(side="left", padx=5)
-        self.api_entry = ttk.Entry(api_top, textvariable=self.api_key, show="*")
+        self.ui_elements["api_key_label"] = ttk.Label(api_row, text=TEXTS[self.lang]["api_key"])
+        self.ui_elements["api_key_label"].pack(side="left", padx=5)
+        self.api_entry = ttk.Entry(api_row, textvariable=self.api_key, show="*")
         self.api_entry.pack(side="left", fill="x", expand=True, padx=5)
         
-        ttk.Button(api_top, text="Save Key", command=self._save_api_key).pack(side="left", padx=5)
+        self.ui_elements["save_key_btn"] = ttk.Button(api_row, text=TEXTS[self.lang]["save_key"], command=self._save_api_key)
+        self.ui_elements["save_key_btn"].pack(side="left", padx=5)
         
-        api_bottom = ttk.Frame(api_frame)
-        api_bottom.pack(fill="x", pady=(8, 0))
-        
-        link_label = ttk.Label(api_bottom, text="➜ Get your free API key at Google AI Studio", foreground="#0078D4", cursor="hand2", font=("Segoe UI", 9, "underline"))
-        link_label.pack(side="left", padx=5)
-        link_label.bind("<Button-1>", lambda e: webbrowser.open("https://aistudio.google.com/api-keys"))
+        # Help link
+        self.ui_elements["get_key_link"] = ttk.Label(config_frame, text=TEXTS[self.lang]["get_key"], foreground="#0078D4", cursor="hand2", font=("Segoe UI", 9, "underline"))
+        self.ui_elements["get_key_link"].pack(anchor="w", padx=5, pady=(5, 10))
+        self.ui_elements["get_key_link"].bind("<Button-1>", lambda e: webbrowser.open("https://aistudio.google.com/api-keys"))
 
-        # 2. File Selection Section (Refactored to be more compact)
-        file_frame = ttk.LabelFrame(main_container, text=" 2. PDF SELECTION ", padding=15)
+        # settings row (Prompt / Language / iLovePDF)
+        settings_row = ttk.Frame(config_frame)
+        settings_row.pack(fill="x")
+
+        # Edit Prompt Button
+        self.ui_elements["edit_prompt_btn"] = ttk.Button(settings_row, text=TEXTS[self.lang]["edit_prompt"], command=self._open_prompt_editor)
+        self.ui_elements["edit_prompt_btn"].pack(side="left", padx=5)
+
+        # Language Switch
+        ttk.Label(settings_row, text=" | ").pack(side="left")
+        self.ui_elements["lang_label"] = ttk.Label(settings_row, text=TEXTS[self.lang]["language"])
+        self.ui_elements["lang_label"].pack(side="left", padx=2)
+        
+        self.lang_btn = ttk.Button(settings_row, text="ES / EN", width=8, command=self._toggle_language)
+        self.lang_btn.pack(side="left", padx=5)
+
+        # iLovePDF Link
+        ttk.Label(settings_row, text=" | ").pack(side="left")
+        self.ui_elements["ilovepdf_link"] = ttk.Label(settings_row, text=TEXTS[self.lang]["ilovepdf"], foreground="#E91E63", cursor="hand2", font=("Segoe UI", 9, "underline"))
+        self.ui_elements["ilovepdf_link"].pack(side="left", padx=5)
+        self.ui_elements["ilovepdf_link"].bind("<Button-1>", lambda e: webbrowser.open("https://www.ilovepdf.com/" + ("es" if self.lang == "ES" else "")))
+
+        # 2. PDF SELECTION
+        file_frame = ttk.LabelFrame(main_container, text=TEXTS[self.lang]["pdf_selection"], padding=15)
         file_frame.pack(fill="x", pady=5)
+        self.ui_elements["pdf_selection"] = file_frame
         
         top_file = ttk.Frame(file_frame)
         top_file.pack(fill="x")
         if self.icons["pdf"]:
             tk.Label(top_file, image=self.icons["pdf"], bg="#FFFFFF").pack(side="left", padx=2)
-        ttk.Label(top_file, text="Select files to process:").pack(side="left", padx=5)
+        self.ui_elements["select_files_label"] = ttk.Label(top_file, text=TEXTS[self.lang]["select_files"])
+        self.ui_elements["select_files_label"].pack(side="left", padx=5)
         
-        # Multi-select button
-        ttk.Button(top_file, text="+ Add Files", command=self._add_files).pack(side="right", padx=5)
-        ttk.Button(top_file, text="🗑 Clear", command=self._clear_files).pack(side="right", padx=5)
+        # Buttons
+        self.ui_elements["add_files_btn"] = ttk.Button(top_file, text=TEXTS[self.lang]["add_files"], command=self._add_files)
+        self.ui_elements["add_files_btn"].pack(side="right", padx=5)
+        self.ui_elements["clear_btn"] = ttk.Button(top_file, text=TEXTS[self.lang]["clear"], command=self._clear_files)
+        self.ui_elements["clear_btn"].pack(side="right", padx=5)
 
-        # Compact file display (Listbox with small height)
+        # Compact file display
         self.file_listbox = tk.Listbox(file_frame, height=3, bd=1, relief="solid", highlightthickness=0, font=("Segoe UI", 8), bg="#FDFDFD")
         self.file_listbox.pack(fill="x", pady=(10, 0))
         
         scrollbar = ttk.Scrollbar(self.file_listbox, orient="vertical", command=self.file_listbox.yview)
-        # Scrollbar only visible if needed, but for 3 lines we keep it simple
         self.file_listbox.config(yscrollcommand=scrollbar.set)
 
         # 3. Output Configuration
-        output_frame = ttk.LabelFrame(main_container, text=" 3. OUTPUT CONFIGURATION ", padding=15)
+        output_frame = ttk.LabelFrame(main_container, text=TEXTS[self.lang]["output_config"], padding=15)
         output_frame.pack(fill="x", pady=5)
+        self.ui_elements["output_config"] = output_frame
         
         # Directory selection
         dir_frame = ttk.Frame(output_frame)
         dir_frame.pack(fill="x", pady=5)
-        ttk.Label(dir_frame, text="Output Folder:").pack(side="left", padx=5)
+        self.ui_elements["output_folder_label"] = ttk.Label(dir_frame, text=TEXTS[self.lang]["output_folder"])
+        self.ui_elements["output_folder_label"].pack(side="left", padx=5)
         ttk.Entry(dir_frame, textvariable=self.output_dir).pack(side="left", fill="x", expand=True, padx=5)
-        ttk.Button(dir_frame, text="Browse...", command=self._browse_output_dir).pack(side="left")
+        self.ui_elements["browse_btn"] = ttk.Button(dir_frame, text=TEXTS[self.lang]["browse"], command=self._browse_output_dir)
+        self.ui_elements["browse_btn"].pack(side="left")
         
-        # Filenames with Icons
+        # Filenames
         name_container = ttk.Frame(output_frame)
         name_container.pack(fill="x", pady=10)
 
@@ -155,50 +309,127 @@ class PDFToXLSXGUI:
         exc_f = ttk.Frame(name_container)
         exc_f.pack(fill="x", pady=2)
         if self.icons["excel"]: tk.Label(exc_f, image=self.icons["excel"], bg="#FFFFFF").pack(side="left", padx=5)
-        ttk.Label(exc_f, text="Excel Name:", width=12).pack(side="left")
+        self.ui_elements["excel_name_label"] = ttk.Label(exc_f, text=TEXTS[self.lang]["excel_name"], width=15)
+        self.ui_elements["excel_name_label"].pack(side="left")
         ttk.Entry(exc_f, textvariable=self.excel_name).pack(side="left", fill="x", expand=True, padx=5)
 
         # CSV field
         csv_f = ttk.Frame(name_container)
         csv_f.pack(fill="x", pady=2)
         if self.icons["csv"]: tk.Label(csv_f, image=self.icons["csv"], bg="#FFFFFF").pack(side="left", padx=5)
-        ttk.Label(csv_f, text="CSV Name:", width=12).pack(side="left")
+        self.ui_elements["csv_name_label"] = ttk.Label(csv_f, text=TEXTS[self.lang]["csv_name"], width=15)
+        self.ui_elements["csv_name_label"].pack(side="left")
         ttk.Entry(csv_f, textvariable=self.csv_name).pack(side="left", fill="x", expand=True, padx=5)
 
         # MD field
         md_f = ttk.Frame(name_container)
         md_f.pack(fill="x", pady=2)
         if self.icons["md"]: tk.Label(md_f, image=self.icons["md"], bg="#FFFFFF").pack(side="left", padx=5)
-        ttk.Label(md_f, text="MD Name:", width=12).pack(side="left")
+        self.ui_elements["md_name_label"] = ttk.Label(md_f, text=TEXTS[self.lang]["md_name"], width=15)
+        self.ui_elements["md_name_label"].pack(side="left")
         ttk.Entry(md_f, textvariable=self.md_name).pack(side="left", fill="x", expand=True, padx=5)
 
         # 4. Options Section
-        opt_frame = ttk.LabelFrame(main_container, text=" 4. OPTIONS ", padding=15)
+        opt_frame = ttk.LabelFrame(main_container, text=TEXTS[self.lang]["options_section"], padding=15)
         opt_frame.pack(fill="x", pady=5)
+        self.ui_elements["options_section"] = opt_frame
         
-        ttk.Checkbutton(opt_frame, text="Excel (.xlsx)", variable=self.save_excel).pack(side="left", padx=10)
-        ttk.Checkbutton(opt_frame, text="Markdown (.md)", variable=self.save_md).pack(side="left", padx=10)
-        ttk.Checkbutton(opt_frame, text="CSV (.csv)", variable=self.save_csv).pack(side="left", padx=10)
-        ttk.Checkbutton(opt_frame, text="Normalize Data", variable=self.clean_data).pack(side="left", padx=10)
+        self.ui_elements["opt_excel"] = ttk.Checkbutton(opt_frame, text=TEXTS[self.lang]["opt_excel"], variable=self.save_excel)
+        self.ui_elements["opt_excel"].pack(side="left", padx=10)
+        self.ui_elements["opt_md"] = ttk.Checkbutton(opt_frame, text=TEXTS[self.lang]["opt_md"], variable=self.save_md)
+        self.ui_elements["opt_md"].pack(side="left", padx=10)
+        self.ui_elements["opt_csv"] = ttk.Checkbutton(opt_frame, text=TEXTS[self.lang]["opt_csv"], variable=self.save_csv)
+        self.ui_elements["opt_csv"].pack(side="left", padx=10)
+        self.ui_elements["opt_normalize"] = ttk.Checkbutton(opt_frame, text=TEXTS[self.lang]["opt_normalize"], variable=self.clean_data)
+        self.ui_elements["opt_normalize"].pack(side="left", padx=10)
 
         # 5. Action Section
         action_frame = ttk.Frame(main_container, padding=10)
         action_frame.pack(fill="x")
         
-        # Updated Button Text (Manual Change Preserved)
-        self.start_btn = ttk.Button(action_frame, text=" START EXTRACTION ", style="Action.TButton", command=self._start_processing)
+        self.start_btn = ttk.Button(action_frame, text=TEXTS[self.lang]["start_btn"], style="Action.TButton", command=self._start_processing)
+        self.ui_elements["start_btn"] = self.start_btn
         self.start_btn.pack(side="top", fill="x", pady=5)
         
         self.progress = ttk.Progressbar(action_frame, orient="horizontal", mode="determinate")
         self.progress.pack(fill="x", pady=10)
 
         # 6. Log Console
-        log_frame = ttk.LabelFrame(main_container, text=" STATUS LOG ", padding=10)
+        log_frame = ttk.LabelFrame(main_container, text=TEXTS[self.lang]["status_log"], padding=10)
         log_frame.pack(fill="both", expand=True, pady=10)
+        self.ui_elements["status_log"] = log_frame
         
         self.log_area = scrolledtext.ScrolledText(log_frame, height=5, font=("Consolas", 9), bg="#F9F9F9", fg="#333333", bd=0)
         self.log_area.pack(fill="both", expand=True)
         self.log_area.config(state="disabled")
+
+    def _toggle_language(self):
+        self.lang = "EN" if self.lang == "ES" else "ES"
+        self._update_ui_language()
+        self._log(f"Language changed to: {self.lang}")
+
+    def _update_ui_language(self):
+        t = TEXTS[self.lang]
+        # Direct widgets
+        self.ui_elements["title"].config(text=t["title"])
+        self.ui_elements["config_section"].config(text=t["config_section"])
+        self.ui_elements["api_key_label"].config(text=t["api_key"])
+        self.ui_elements["save_key_btn"].config(text=t["save_key"])
+        self.ui_elements["get_key_link"].config(text=t["get_key"])
+        self.ui_elements["edit_prompt_btn"].config(text=t["edit_prompt"])
+        self.ui_elements["lang_label"].config(text=t["language"])
+        self.ui_elements["ilovepdf_link"].config(text=t["ilovepdf"])
+        self.ui_elements["pdf_selection"].config(text=t["pdf_selection"])
+        self.ui_elements["select_files_label"].config(text=t["select_files"])
+        self.ui_elements["add_files_btn"].config(text=t["add_files"])
+        self.ui_elements["clear_btn"].config(text=t["clear"])
+        self.ui_elements["output_config"].config(text=t["output_config"])
+        self.ui_elements["output_folder_label"].config(text=t["output_folder"])
+        self.ui_elements["browse_btn"].config(text=t["browse"])
+        self.ui_elements["excel_name_label"].config(text=t["excel_name"])
+        self.ui_elements["csv_name_label"].config(text=t["csv_name"])
+        self.ui_elements["md_name_label"].config(text=t["md_name"])
+        self.ui_elements["options_section"].config(text=t["options_section"])
+        self.ui_elements["opt_excel"].config(text=t["opt_excel"])
+        self.ui_elements["opt_md"].config(text=t["opt_md"])
+        self.ui_elements["opt_csv"].config(text=t["opt_csv"])
+        self.ui_elements["opt_normalize"].config(text=t["opt_normalize"])
+        self.ui_elements["start_btn"].config(text=t["start_btn"])
+        self.ui_elements["status_log"].config(text=t["status_log"])
+        
+        # Explicit update iLovePDF link based on lang
+        self.ui_elements["ilovepdf_link"].unbind("<Button-1>")
+        self.ui_elements["ilovepdf_link"].bind("<Button-1>", lambda e: webbrowser.open("https://www.ilovepdf.com/" + ("es" if self.lang == "ES" else "")))
+
+    def _open_prompt_editor(self):
+        editor = tk.Toplevel(self.root)
+        editor.title(TEXTS[self.lang]["prompt_editor_title"])
+        editor.geometry("600x400")
+        editor.transient(self.root)
+        editor.grab_set()
+
+        content_f = ttk.Frame(editor, padding=10)
+        content_f.pack(fill="both", expand=True)
+
+        txt_area = scrolledtext.ScrolledText(content_f, font=("Segoe UI", 10), wrap="word")
+        txt_area.pack(fill="both", expand=True, pady=(0, 10))
+        txt_area.insert(tk.END, self.current_prompt)
+
+        btn_f = ttk.Frame(content_f)
+        btn_f.pack(fill="x")
+
+        def save_prompt():
+            self.current_prompt = txt_area.get("1.0", tk.END).strip()
+            editor.destroy()
+            self._log("Prompt updated.")
+
+        def reset_prompt():
+            txt_area.delete("1.0", tk.END)
+            txt_area.insert(tk.END, DEFAULT_PROMPT.strip())
+
+        ttk.Button(btn_f, text=TEXTS[self.lang]["save"], command=save_prompt).pack(side="right", padx=5)
+        ttk.Button(btn_f, text=TEXTS[self.lang]["cancel"], command=editor.destroy).pack(side="right", padx=5)
+        ttk.Button(btn_f, text=TEXTS[self.lang]["reset"], command=reset_prompt).pack(side="left", padx=5)
 
     def _log(self, message):
         self.log_area.config(state="normal")
@@ -214,12 +445,13 @@ class PDFToXLSXGUI:
             key = os.getenv("API_KEY")
             if key:
                 self.api_key.set(key)
-                self._log("Ready: API key loaded.")
+                msg = "Ready: API key loaded." if self.lang == "EN" else "Listo: Clave API cargada."
+                self._log(msg)
 
     def _save_api_key(self):
         key = self.api_key.get().strip()
         if not key:
-            messagebox.showwarning("Warning", "Please enter an API Key first.")
+            messagebox.showwarning(TEXTS[self.lang]["warning"], TEXTS[self.lang]["no_key"])
             return
         
         env_path = os.path.join(os.getcwd(), "api_key.env")
@@ -229,8 +461,8 @@ class PDFToXLSXGUI:
         else:
             set_key(env_path, "API_KEY", key)
         
-        messagebox.showinfo("Success", "API Key saved to api_key.env")
-        self._log("API key updated successfully.")
+        messagebox.showinfo(TEXTS[self.lang]["success"], TEXTS[self.lang]["key_saved"])
+        self._log(TEXTS[self.lang]["key_saved"])
 
     def _add_files(self):
         files = filedialog.askopenfilenames(filetypes=[("PDF Files", "*.pdf")])
@@ -240,32 +472,32 @@ class PDFToXLSXGUI:
                 if full_path not in self.pdf_files:
                     self.pdf_files.append(full_path)
                     self.file_listbox.insert(tk.END, os.path.basename(f))
-            self._log(f"Added {len(files)} new files.")
+            self._log(TEXTS[self.lang]["files_added"].format(len(files)))
 
     def _clear_files(self):
         self.pdf_files = []
         self.file_listbox.delete(0, tk.END)
-        self._log("File selection cleared.")
+        self._log(TEXTS[self.lang]["files_cleared"])
 
     def _browse_output_dir(self):
         directory = filedialog.askdirectory()
         if directory:
             self.output_dir.set(os.path.abspath(directory))
-            self._log(f"Output path: {directory}")
+            self._log(TEXTS[self.lang]["output_path_set"].format(directory))
 
     def _start_processing(self):
         if not self.api_key.get().strip():
-            messagebox.showerror("Error", "Gemini API Key is required.")
+            messagebox.showerror(TEXTS[self.lang]["error"], TEXTS[self.lang]["no_key"])
             return
         
         # Check API Key length
         api_key_val = self.api_key.get().strip()
         if len(api_key_val) != 39:
-            messagebox.showwarning("Error", "Incorrect API Key length. The key must be 39 characters long.\n\nLongitud de API incorrecta. La clave debe tener 39 caracteres.")
+            messagebox.showwarning(TEXTS[self.lang]["error"], TEXTS[self.lang]["key_length"])
             return
 
         if not self.pdf_files:
-            messagebox.showerror("Error", "Please add at least one PDF file.")
+            messagebox.showerror(TEXTS[self.lang]["error"], TEXTS[self.lang]["no_files"])
             return
         
         out_dir = self.output_dir.get().strip()
@@ -312,7 +544,7 @@ class PDFToXLSXGUI:
 
             for i, pdf_path in enumerate(self.pdf_files):
                 file_name = os.path.basename(pdf_path)
-                self._log(f"Working on: {file_name}")
+                self._log(TEXTS[self.lang]["working_on"].format(file_name))
                 
                 all_results = []
                 try:
@@ -347,7 +579,7 @@ class PDFToXLSXGUI:
                                 f.write(f"# Extracted Tables for {file_name}\n\n")
                                 for idx, p in enumerate(processed):
                                     f.write(f"## Table {idx+1}\n\n{p['md']}\n\n")
-                            self._log(f"  + Saved MD: {md_base}")
+                            self._log(TEXTS[self.lang]["saved_md"].format(md_base))
                         
                         if self.save_csv.get():
                             csv_filename = self.csv_name.get().strip()
@@ -355,11 +587,11 @@ class PDFToXLSXGUI:
                             csv_base = f"{short_name}_{csv_filename}" if len(self.pdf_files) > 1 else csv_filename
                             csv_path = os.path.join(out_dir, csv_base)
                             combined_df.to_csv(csv_path, index=False, header=False)
-                            self._log(f"  + Saved CSV: {csv_base}")
+                            self._log(TEXTS[self.lang]["saved_csv"].format(csv_base))
                             
-                        self._log(f"DONE: {file_name}")
+                        self._log(TEXTS[self.lang]["done"].format(file_name))
                     else:
-                        self._log(f"SKIP: No tables in {file_name}")
+                        self._log(TEXTS[self.lang]["skip"].format(file_name))
                 
                 except Exception as e:
                     self._log(f"ERROR: {file_name} -> {e}")
@@ -374,21 +606,19 @@ class PDFToXLSXGUI:
                     self._log(f"Results consolidated in EXCEL: {excel_filename}")
 
             if not self._has_error:
-                self._log("SYSTEM: All tasks completed. / Todas las tareas completadas.")
-                self.root.after(0, lambda: messagebox.showinfo("Process Finished / Proceso Finalizado", "The extraction process has completed successfully!\n\n¡El proceso de extracción ha finalizado con éxito!"))
+                self._log(TEXTS[self.lang]["all_tasks_done"])
+                self.root.after(0, lambda: messagebox.showinfo(TEXTS[self.lang]["process_finished"], TEXTS[self.lang]["process_success"]))
             else:
-                self._log("SYSTEM: Process finished with errors. / Proceso finalizado con errores.")
+                self._log(TEXTS[self.lang]["process_error"])
             
         except Exception as e:
             self._log(f"CRITICAL ERROR: {e}")
             if "400" in str(e):
-                msg = "The API key entered is incorrect (Code 400). Please verify it and try again.\n\nLa API Key ingresada no es correcta (Código 400). Por favor, verifíquela e inténtelo de nuevo."
-                messagebox.showerror("API Key Error / Error de API Key", msg)
+                messagebox.showerror(TEXTS[self.lang]["error"], TEXTS[self.lang]["api_error"])
             elif "429" in str(e):
-                msg = "The daily API limit has been exceeded (Code 429).\n\nSe ha excedido el límite de la API diario (Código 429)."
-                messagebox.showerror("Quota Error / Error de Cuota", msg)
+                messagebox.showerror(TEXTS[self.lang]["error"], TEXTS[self.lang]["quota_error"])
             else:
-                messagebox.showerror("System Error / Error del Sistema", f"The process encountered a fatal error / El proceso encontró un error fatal: {e}")
+                messagebox.showerror(TEXTS[self.lang]["error"], f"{TEXTS[self.lang]['fatal_error']}: {e}")
         
         self.root.after(0, lambda: self.start_btn.config(state="normal"))
 
@@ -396,16 +626,10 @@ class PDFToXLSXGUI:
         self.progress["value"] = val
 
     def _extract_from_page(self, client, page):
-        self._log(f"    - Analyzing page {page.page_number}...")
+        self._log(TEXTS[self.lang]["analyzing_page"].format(page.page_number))
         try:
             img = page.to_image(resolution=300).original
-            prompt = """
-            Analyze this page and extract ALL tables you see.
-            Even if the table looks like a screenshot or an embedded image, extract it.
-            Return results strictly in Markdown format.
-            Do not include any introductory text, titles outside the table, or comments.
-            If no tables are found, return an empty string.
-            """
+            prompt = self.current_prompt
             
             max_retries = 1
             md_text = ""

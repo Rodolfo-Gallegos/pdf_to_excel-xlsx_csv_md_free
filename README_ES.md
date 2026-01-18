@@ -21,7 +21,7 @@ _Documentación: [English](README.md) | [Español](README_ES.md)_
 - **Interfaz Gráfica (GUI)**: Pantalla de uso sencillo con registro en tiempo real y barra de progreso.
 - **Exportación Multi-formato**: Guarda resultados en **Excel (.xlsx)**, **CSV** y **Markdown**.
 - **Limpieza de Datos**: Normalización opcional para eliminar símbolos de moneda y fijar formatos numéricos.
-- **Instalación Automatizada**: Script de configuración para usuarios de Windows.
+- **Instalación Automatizada**: Scripts de un solo clic para **Windows (.bat)**, **Linux** y **macOS (.sh)**.
 
 ## 🤖 Compatibilidad con LLMs y Propósito
 
@@ -65,11 +65,12 @@ _En este video explico cómo configurar el repositorio y cómo usar tanto la ver
 2. Haz doble clic en **`setup_windows.bat`**.
    - _Esto instalará Python automáticamente (si falta), configurará las dependencias e iniciará la app._
 
-### Para Linux (Ubuntu/Debian)
+### Para Linux y macOS
 
-1. `sudo apt install python3-tk` (Opcional: solo necesario para la GUI).
-2. `pip3 install -r requirements.txt`
-3. Inicia con `python3 gui_app.py` o usa la terminal (CLI).
+1. Descarga o clona este repositorio.
+2. Abre la terminal en la carpeta y ejecuta: `chmod +x run_unix.sh create_shortcut.sh`
+3. Ejecuta **`./run_unix.sh`** desde tu terminal.
+4. _(Opcional solo Linux)_: Ejecuta **`./create_shortcut.sh`** para añadir un "botón" a tu menú de aplicaciones.
 
 ---
 
@@ -130,4 +131,3 @@ python3 pdf_to_xlsx.py documento.pdf --clean --md --csv -o tablas_excel.xlsx
 Este proyecto está bajo la Licencia MIT - mira el archivo [LICENSE](LICENSE) para más detalles.
 
 ---
-
