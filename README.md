@@ -1,6 +1,6 @@
 # PDF to EXCEL/CSV/MD AI extractor
 
-An AI-powered tool that extracts tables from PDF files using Gemini AI.
+An AI-powered tool that extracts tables from PDF files (scanned/digital) using Gemini AI.
 
 ## Result showcase
 
