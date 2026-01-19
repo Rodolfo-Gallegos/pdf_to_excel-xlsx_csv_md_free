@@ -9,7 +9,7 @@ def main():
     # Set window icon
     try:
         base_dir = os.path.dirname(os.path.abspath(__file__))
-        icon_path = os.path.join(base_dir, "assets", "icons", "pdf_icon.png")
+        icon_path = os.path.join(base_dir, "assets", "icons", "pdf_to_excel.png")
         if os.path.exists(icon_path):
             img = Image.open(icon_path)
             photo = ImageTk.PhotoImage(img)

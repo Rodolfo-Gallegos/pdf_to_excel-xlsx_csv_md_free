@@ -43,7 +43,7 @@ if not exist "%SC_PATH%" (
         $s.TargetPath='pythonw.exe'; ^
         $s.Arguments='\"%~dp0src\main.py\"'; ^
         $s.WorkingDirectory='%~dp0'; ^
-        $s.IconLocation='%~dp0src\assets\icons\pdf_icon.png'; ^
+        $s.IconLocation='%~dp0src\assets\icons\pdf_to_excel.png'; ^
         $s.Description='Extract tables from PDF using AI'; ^
         $s.Save()"
     echo [OK] Shortcut created on Desktop.

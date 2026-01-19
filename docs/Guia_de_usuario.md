@@ -4,8 +4,6 @@ Una herramienta potenciada por IA que extrae tablas de archivos PDF analizando l
 
 ## 📊 Resumen de resultados
 
-### PDF Origen vs. Salida
-
 | 1. PDF Original | 2. Resultado Excel | 3. Resultado Markdown | 4. Resultado CSV |
 | :---: | :---: | :---: | :---: |
 | ![PDF Original](screenshots/pdf_tables.png) | ![Salida Excel](screenshots/xlsx_table.png) | ![Salida Markdown](screenshots/markdown_table.png) | ![Salida CSV](screenshots/csv_table.png) |
@@ -15,25 +13,23 @@ Una herramienta potenciada por IA que extrae tablas de archivos PDF analizando l
 
 ## ✨ Características
 
-- **IA Multimodal**: Utiliza visión artificial para extraer tablas exactamente como aparecen.
-- **Interfaz Gráfica (GUI)**: Pantalla de uso sencillo con registro en tiempo real.
-- **Exportación Multi-formato**: guarda en **Excel (.xlsx)**, **CSV** y **Markdown**.
-- **Limpieza de Datos**: Normalización opcional.
-- **Instalación Automatizada**: Scripts de un solo clic.
+- **IA Multimodal**: Extracción mediante visión artificial.
+- **Interfaz Gráfica (GUI)**: Registro en tiempo real y progreso.
+- **Multi-formato**: Excel (.xlsx), CSV y Markdown.
 - **Procesamiento Selectivo**: Indica páginas específicas (ej: "Página 2").
 
 ## 📂 Estructura del Proyecto
 
 ```text
 PDF_to_XLSX/
-├── EJECUTAR_WINDOWS.bat  # Lanzador principal Windows
-├── EJECUTAR_LINUX.sh    # Lanzador principal Linux/macOS
+├── Windows_exec.bat     # Lanzador principal Windows
+├── Linux_exec.sh        # Lanzador principal Linux/macOS
 ├── README.md            # Guía rápida
 ├── docs/                # Manuales y capturas
-│   ├── Manual_ES.md
-│   └── Manual_EN.md
+│   ├── User_guide.md
+│   └── Guia_de_usuario.md
 └── src/                 # Código fuente y activos
-    ├── assets/icons/    # Iconos
+    ├── assets/icons/    # Iconos (pdf_to_excel.png)
     ├── ui/              # Interfaz
     ├── logic/           # Lógica de procesamiento
     ├── main.py          # Punto de entrada GUI
@@ -45,14 +41,15 @@ PDF_to_XLSX/
 
 ### En Windows
 
-1. Haz doble clic en **`EJECUTAR_WINDOWS.bat`**.
-2. Automáticamente instalará Python (si falta), las dependencias y creará un acceso directo en tu escritorio.
+1. Haz doble clic en **`Windows_exec.bat`**.
+2. Instalará dependencias y creará un acceso directo en el escritorio.
 
 ### En Linux & macOS
 
 1. Abre una terminal en la carpeta.
-2. Ejecuta: `chmod +x EJECUTAR_LINUX.sh`
-3. Ejecuta: `./EJECUTAR_LINUX.sh`
+2. Ejecuta: `chmod +x Linux_exec.sh`
+3. Ejecuta: `./Linux_exec.sh`
+4. **Icono de Escritorio**: Tras la primera ejecución, aparecerá en tu menú. En Ubuntu, haz clic derecho en el icono del escritorio y elige **"Permitir lanzar"**.
 
 ---
 
@@ -61,20 +58,21 @@ PDF_to_XLSX/
 ### Versión 1: Interfaz Gráfica (GUI)
 
 ```bash
-python src/main.py
+python -m src.main
 ```
 
 ### Versión 2: Línea de Comandos (CLI)
 
 ```bash
-python src/cli.py archivo1.pdf archivo2.pdf --output resultados.xlsx
+python -m src.cli archivo.pdf --output resultados.xlsx
 ```
 
-## ⚙️ Configuración y llave API
+## ⚙️ Configuración
 
-1. Consigue tu clave gratuita en [Google AI Studio](https://aistudio.google.com/api-keys).
-2. Edita el archivo `src/api_key.env` y sustituye el valor.
+1. Consigue tu clave en [Google AI Studio](https://aistudio.google.com/api-keys).
+2. Guárdala en la app o edita `src/api_key.env`.
 
-## 📜 Licencia
+## 🏗 Detalles técnicos
 
-Este proyecto está bajo la Licencia MIT.
+1. **Renderizado**: `pdfplumber` (300 DPI).
+2. **Consolidación**: Hoja "Summary" seguida de hojas de datos por archivo.

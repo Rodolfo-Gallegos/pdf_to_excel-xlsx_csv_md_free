@@ -28,9 +28,13 @@ then
         echo "[X] Failed to install dependencies."
         exit 1
     fi
+    echo "[OK] Dependencies installed."
 fi
 
-# Launch GUI
+# 3. Update Desktop Shortcut
+bash "$SCRIPT_DIR/src/create_shortcut.sh"
+
+# 4. Launch GUI
 echo "[*] Starting Application..."
 $PYTHON_CMD src/main.py &
 

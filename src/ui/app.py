@@ -79,7 +79,7 @@ class PDFToXLSXGUI:
         base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
         icon_dir = os.path.join(base_dir, "src", "assets", "icons")
         icon_map = {
-            "pdf": "pdf_icon.png", "excel": "excel_icon.png",
+            "pdf": "pdf_to_excel.png", "excel": "excel_icon.png",
             "csv": "csv_icon.png", "md": "markdown_icon.png"
         }
         for key, filename in icon_map.items():
