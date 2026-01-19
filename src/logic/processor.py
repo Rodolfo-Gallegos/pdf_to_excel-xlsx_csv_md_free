@@ -1,3 +1,4 @@
+import os
 import time
 import re
 import pandas as pd
@@ -38,42 +39,100 @@ def parse_md(md_text: str) -> pd.DataFrame:
     norm_data = [row + [''] * (max_cols - len(row)) for row in data]
     return pd.DataFrame(norm_data)
 
-def parse_page_query(prompt: str, total_pages: int) -> List[int]:
+ORDINAL_MAP = {
+    "primera": 1, "primero": 1, "first": 1,
+    "segunda": 2, "segundo": 2, "second": 2,
+    "tercera": 3, "tercero": 3, "third": 3,
+    "cuarta": 4, "cuarto": 4, "fourth": 4,
+    "quinta": 5, "quinto": 5, "fifth": 5,
+    "sexta": 6, "sexto": 6, "sixth": 6,
+    "séptima": 7, "séptimo": 7, "seventh": 7,
+    "octava": 8, "octavo": 8, "eighth": 8,
+    "novena": 9, "noveno": 9, "ninth": 9,
+    "décima": 10, "décimo": 10, "tenth": 10,
+    "última": -1, "último": -1, "last": -1
+}
+
+def parse_page_query(prompt: str, total_pages: int, current_filename: str = None, all_filenames: List[str] = []) -> List[int]:
     """
-    Parses the prompt to find page references like 'página 2', 'page 1-3', etc.
-    Returns a list of 0-indexed page numbers.
+    Parses the prompt to find page references. 
+    Supports document-specific requests: "página 1 de DocA, página 2 de DocB".
     """
     prompt_lower = prompt.lower()
     
-    # Check for keywords related to single pages or ranges
-    # Examples: "página 2", "page 3", "páginas 1 a 3", "pages 2-4"
-    patterns = [
-        r"(?:p\u00e1gina|page)\s+(\d+)",           # "página 2"
-        r"(?:p\u00e1ginas|pages)\s+(\d+)\s+(?:a|to|-)\s+(\d+)", # "páginas 1 a 3"
-        r"(?:p\u00e1ginas|pages)\s+(\d+)(?:,)\s*(\d+)", # "páginas 1, 2" (simple case)
-    ]
+    # 0. Identify which files are mentioned in the entire prompt
+    mentioned_files = []
+    if all_filenames:
+        for f in all_filenames:
+            name_no_ext = os.path.splitext(f)[0].lower()
+            pattern = rf"\b({re.escape(f.lower())}|{re.escape(name_no_ext)})\b"
+            if re.search(pattern, prompt_lower):
+                mentioned_files.append(f)
     
+    # 1. Determine target text for the current file
+    target_text = prompt_lower
+    if mentioned_files:
+        # If any files are mentioned but NOT the current one, skip this file
+        if current_filename not in mentioned_files:
+            return []
+            
+        # Split prompt into semantic blocks (by connectors and punctuation)
+        # Delimiters: , ; . and y e (Spanish)
+        blocks = re.split(r'[,;.]|\b(?:y|and|e)\b', prompt_lower)
+        blocks = [b.strip() for b in blocks if b.strip()]
+        
+        # Find blocks that mention the current file
+        name_no_ext = os.path.splitext(current_filename)[0].lower()
+        cur_pattern = rf"\b({re.escape(current_filename.lower())}|{re.escape(name_no_ext)})\b"
+        
+        relevant_blocks = [b for b in blocks if re.search(cur_pattern, b)]
+        
+        if relevant_blocks:
+            target_text = " ".join(relevant_blocks)
+            # Check if these specific blocks contain any page instructions
+            # We'll do a quick check to see if it's worth restricting to these blocks
+            has_instr = any(re.search(r"\b\d+\b|p\u00e1gina|page|first|primera|last|\u00faltima", b) for b in relevant_blocks)
+            if not has_instr:
+                # Fallback: file was mentioned in a block without instructions (e.g. "p1 de A y B")
+                # Use the full prompt for search but stay within "mentioned" mode
+                target_text = prompt_lower
+        else:
+            # Fallback for complex nesting
+            target_text = prompt_lower
+
     selected_pages = set()
     
-    # Pattern 1: Range "pages 1 to 3"
-    range_match = re.search(r"(?:p\u00e1ginas|pages)\s+(\d+)\s*(?:a|to|-)\s*(\d+)", prompt_lower)
-    if range_match:
-        start = int(range_match.group(1))
-        end = int(range_match.group(2))
+    # 2. Check for ranges: "páginas 1 a 3", "pages 2-4"
+    range_matches = re.finditer(r"(?:p\u00e1ginas?|pages?)\s+(\d+)\s*(?:a|to|-)\s*(\d+)", target_text)
+    for match in range_matches:
+        start = int(match.group(1))
+        end = int(match.group(2))
         for p in range(start, end + 1):
             if 1 <= p <= total_pages:
                 selected_pages.add(p - 1)
+
+    # 3. Check for numeric single pages or lists: "página 2", "page 3", "páginas 1, 3, 5"
+    numeric_parts = re.split(r"(?:p\u00e1ginas?|pages?)", target_text)
+    if len(numeric_parts) > 1:
+        for part in numeric_parts[1:]:
+            potential_numbers = re.findall(r"\b\d+\b", part)
+            for num_str in potential_numbers:
+                p = int(num_str)
+                if 1 <= p <= total_pages:
+                    selected_pages.add(p - 1)
+
+    # 4. Check for ordinal words: "primera página", "last page"
+    for word, val in ORDINAL_MAP.items():
+        if re.search(rf"\b{word}\b", target_text):
+            actual_p = val if val > 0 else total_pages + val + 1
+            if 1 <= actual_p <= total_pages:
+                selected_pages.add(actual_p - 1)
+    
+    if selected_pages:
         return sorted(list(selected_pages))
 
-    # Pattern 2: Single page "page 2"
-    single_match = re.search(r"(?:p\u00e1gina|page)\s+(\d+)", prompt_lower)
-    if single_match:
-        p = int(single_match.group(1))
-        if 1 <= p <= total_pages:
-            selected_pages.add(p - 1)
-        return sorted(list(selected_pages))
-
-    # If no specific page found, return all pages
+    # Fallback: if filename mentioned but no specific pages found, return all its pages.
+    # Otherwise return all pages (global mode)
     return list(range(total_pages))
 
 def extract_from_page(client: genai.Client, page: Any, prompt: str, log_callback=None, error_tracker: Dict[str, bool] = None) -> List[Dict[str, Any]]:
@@ -99,6 +158,9 @@ def extract_from_page(client: genai.Client, page: Any, prompt: str, log_callback
                 if "400" in str(e):
                     if error_tracker is not None: error_tracker["has_error"] = True
                     raise e
+                elif "403" in str(e):
+                    if error_tracker is not None: error_tracker["has_error"] = True
+                    raise e
                 elif "429" in str(e):
                     if attempt < max_retries - 1:
                         time.sleep((attempt + 1) * 10)
@@ -114,7 +176,8 @@ def extract_from_page(client: genai.Client, page: Any, prompt: str, log_callback
             if not df.empty:
                 return [{"df": df, "md": clean_md}]
     except Exception as e:
-        if "400" in str(e) or "429" in str(e):
+        if "400" in str(e) or "429" in str(e) or "403" in str(e):
             raise e
-        # Other errors are logged via callback or returned empty
+        else:
+            raise e
     return []

@@ -65,6 +65,7 @@ TEXTS = {
         "output_path_set": "Output path: {}",
         "fatal_error": "The process encountered a fatal error",
         "quota_error": "The daily API limit has been exceeded (Code 429).",
+        "api_leaked": "The API key has been leaked, create a new one (Code 403).",
         "api_error": "The API key entered is incorrect (Code 400). Please verify it and try again."
     },
     "ES": {
@@ -121,6 +122,7 @@ TEXTS = {
         "output_path_set": "Ruta de salida: {}",
         "fatal_error": "El proceso encontró un error fatal",
         "quota_error": "Se ha excedido el límite de la API diario (Código 429).",
+        "api_leaked": "La clave API ha sido filtrada, cree una nueva (Código 403).",
         "api_error": "La clave API ingresada no es correcta (Código 400). Por favor, verifíquela e inténtelo de nuevo."
     }
-}
+}                   

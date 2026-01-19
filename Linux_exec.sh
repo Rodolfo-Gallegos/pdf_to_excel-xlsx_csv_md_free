@@ -36,7 +36,15 @@ bash "$SCRIPT_DIR/src/create_shortcut.sh"
 
 # 4. Launch GUI
 echo "[*] Starting Application..."
-$PYTHON_CMD src/main.py &
+$PYTHON_CMD -m src.main &
+
+echo "[OK] Application started."
+
+echo "--------------------------------------------------"
+
+echo "Right click on the desktop shortcut and select 'Allow Launching' to enable it."
+
+echo "--------------------------------------------------"
 
 sleep 2
 exit 0

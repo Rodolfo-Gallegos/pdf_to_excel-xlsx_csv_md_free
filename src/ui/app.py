@@ -406,8 +406,11 @@ class PDFToXLSXGUI:
             
             writer = None
             if self.save_excel.get():
-                writer = pd.ExcelWriter(excel_path, engine='openpyxl')
-                pd.DataFrame([["Tables extracted from GUI Application"]]).to_excel(writer, sheet_name="Summary", index=False, header=False)
+                if os.path.exists(excel_path):
+                    writer = pd.ExcelWriter(excel_path, engine='openpyxl', mode='a', if_sheet_exists='replace')
+                else:
+                    writer = pd.ExcelWriter(excel_path, engine='openpyxl')
+                    pd.DataFrame([["Tables extracted from GUI Application"]]).to_excel(writer, sheet_name="Summary", index=False, header=False)
 
             tracker = {"has_error": False}
             for i, pdf_path in enumerate(self.pdf_files):
@@ -418,7 +421,8 @@ class PDFToXLSXGUI:
                 try:
                     with pdfplumber.open(pdf_path) as pdf:
                         total_pages = len(pdf.pages)
-                        pages_to_process = parse_page_query(self.current_prompt, total_pages)
+                        all_basenames = [os.path.basename(f) for f in self.pdf_files]
+                        pages_to_process = parse_page_query(self.current_prompt, total_pages, file_name, all_basenames)
                         
                         if len(pages_to_process) < total_pages:
                             self._log(f"Selective Mode: Processing {len(pages_to_process)} specific pages.")
@@ -482,7 +486,7 @@ class PDFToXLSXGUI:
             
         except Exception as e:
             self._log(f"CRITICAL ERROR: {e}")
-            err_type = "api_error" if "400" in str(e) else "quota_error" if "429" in str(e) else None
+            err_type = "api_error" if "400" in str(e) else "quota_error" if "429" in str(e) else "api_leaked" if "403" in str(e) else "unknown_error"
             if err_type:
                 messagebox.showerror(TEXTS[self.lang]["error"], TEXTS[self.lang][err_type])
             else:
