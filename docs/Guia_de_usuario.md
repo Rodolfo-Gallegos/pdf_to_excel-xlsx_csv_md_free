@@ -42,7 +42,7 @@ El sistema entiende números ordinales (tanto en español como en inglés):
 
 Al procesar varios archivos a la vez, puedes dirigir la instrucción a archivos específicos:
 
-- _"Extraer página 1 de **Cotizacion_A.pdf** y la última página de **Cotizacion_B.pdf**"_
+- _"Extraer página 1 de **Archivo_A.pdf** y la última página de **Archivo_B.pdf**"_
 - _"Extraer tablas de **Doc1**"_ (Esto omitirá otros archivos en la cola de procesamiento)
 
 ---

@@ -42,7 +42,7 @@ The system understands ordinal numbers (both in English and Spanish):
 
 When processing multiple files at once, you can target specific files:
 
-- _"Extract page 1 from **Quote_A.pdf** and the last page from **Quote_B.pdf**"_
+- _"Extract page 1 from **Document_A.pdf** and the last page from **Document_B.pdf**"_
 - _"Extract tables from **Doc1**"_ (This will skip other files in the queue)
 
 ---

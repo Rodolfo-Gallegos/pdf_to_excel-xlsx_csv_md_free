@@ -63,4 +63,4 @@ You can ask the AI to process specific pages or files by modifying the prompt. I
 - _"Extraer páginas 1, 3 y 5"_
 - _"Extraer de la página 2 a la 4"_
 - _"Extraer la primera y la última página"_
-- _"Extraer p1 de DocA y p2 de DocB"_
+- _"Extraer página 1 de ArchivoA y página 2 de ArchivoB"_

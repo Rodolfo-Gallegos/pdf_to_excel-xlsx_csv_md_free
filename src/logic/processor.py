@@ -102,8 +102,8 @@ def parse_page_query(prompt: str, total_pages: int, current_filename: str = None
 
     selected_pages = set()
     
-    # 2. Check for ranges: "páginas 1 a 3", "pages 2-4"
-    range_matches = re.finditer(r"(?:p\u00e1ginas?|pages?)\s+(\d+)\s*(?:a|to|-)\s*(\d+)", target_text)
+    # 2. Check for ranges: "páginas 1 a 3", "pages 2-4", "p1-3"
+    range_matches = re.finditer(r"(?:p\u00e1ginas?|pages?|p)\s*(\d+)\s*(?:a|to|-)\s*(\d+)", target_text)
     for match in range_matches:
         start = int(match.group(1))
         end = int(match.group(2))
@@ -111,8 +111,8 @@ def parse_page_query(prompt: str, total_pages: int, current_filename: str = None
             if 1 <= p <= total_pages:
                 selected_pages.add(p - 1)
 
-    # 3. Check for numeric single pages or lists: "página 2", "page 3", "páginas 1, 3, 5"
-    numeric_parts = re.split(r"(?:p\u00e1ginas?|pages?)", target_text)
+    # 3. Check for numeric single pages or lists: "página 2", "page 3", "páginas 1, 3, 5", "p1, p3"
+    numeric_parts = re.split(r"(?:p\u00e1ginas?|pages?|p)", target_text)
     if len(numeric_parts) > 1:
         for part in numeric_parts[1:]:
             potential_numbers = re.findall(r"\b\d+\b", part)
