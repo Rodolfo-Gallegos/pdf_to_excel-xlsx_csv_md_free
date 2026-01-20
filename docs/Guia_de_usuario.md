@@ -1,49 +1,69 @@
-# Extractor de PDF a EXCEL/CSV/MD con IA
+# Extractor de PDF a EXCEL / CSV / MD con IA
 
-Una herramienta potenciada por IA que extrae tablas de archivos PDF analizando las páginas como imágenes mediante el modelo Gemini 3 Flash Preview.
-
-## 📊 Resumen de resultados
-
-| 1. PDF Original | 2. Resultado Excel | 3. Resultado Markdown | 4. Resultado CSV |
-| :---: | :---: | :---: | :---: |
-| ![PDF Original](screenshots/pdf_tables.png) | ![Salida Excel](screenshots/xlsx_table.png) | ![Salida Markdown](screenshots/markdown_table.png) | ![Salida CSV](screenshots/csv_table.png) |
-
-> [!TIP]
-> **De imagen en pdf a datos estructurados en segundos.** Ideal para documentos escaneados y reportes complejos.
-
-## ✨ Características
-
-- **IA Multimodal**: Extracción mediante visión artificial.
-- **Interfaz Gráfica (GUI)**: Registro en tiempo real y progreso.
-- **Multi-formato**: Excel (.xlsx), CSV y Markdown.
-- **Procesamiento Selectivo**: Control avanzado sobre qué páginas analizar mediante lenguaje natural.
+Una **aplicación de escritorio** potenciada por IA que extrae tablas de archivos PDF (digitales o escaneados) y las convierte en **Excel, CSV o Markdown**, utilizando el modelo **Gemini**.
 
 ---
 
-## 🧠 Selección inteligente de páginas
+## Inicio rápido
 
-El "prompt" de la IA no solo sirve para decirle a Gemini cómo extraer los datos, sino también para especificar **qué** datos mirar. Puedes usar lenguaje natural para filtrar páginas y documentos.
+1. En GitHub, haz clic en **<> Code → Download ZIP**
+2. **Extrae** el archivo ZIP en una carpeta
+3. Haz doble clic en **`Windows_exec.bat`**
+4. Espera a que la aplicación se abra automáticamente
+5. Pega tu **API Key de Gemini**
+6. Haz clic en **Añadir archivos** y selecciona tus PDFs
+7. Haz clic en **Iniciar extracción**
+
+✅ Los archivos generados aparecerán en la carpeta **`extracted_tables`**.
+
+---
+
+## Ejemplo de resultados
+
+|               1. PDF Original               |              2. Resultado Excel             |                3. Resultado Markdown               |             4. Resultado CSV             |
+| :-----------------------------------------: | :-----------------------------------------: | :------------------------------------------------: | :--------------------------------------: |
+| ![PDF Original](screenshots/pdf_tables.png) | ![Salida Excel](screenshots/xlsx_table.png) | ![Salida Markdown](screenshots/markdown_table.png) | ![Salida CSV](screenshots/csv_table.png) |
+
+> 💡 **De PDF (incluso escaneado) a datos estructurados en segundos.** Ideal para reportes, estados de cuenta y documentos complejos.
+
+---
+
+## ✨ Características principales
+
+* **IA multimodal**: análisis visual de páginas PDF como imágenes
+* **Interfaz gráfica (GUI)** fácil de usar
+* **Multi‑formato**: exporta a Excel (`.xlsx`), CSV (`.csv`) y Markdown (`.md`)
+* **Selección inteligente de páginas** usando lenguaje natural
+* **Soporte multi‑archivo** en una sola ejecución
+* **Resultados organizados** con hoja de resumen en Excel
+
+---
+
+## Selección inteligente de páginas
+
+El campo de *prompt* permite indicarle a la IA **qué páginas procesar** y **cómo hacerlo**, usando lenguaje natural en español o inglés.
 
 ### Selección básica
 
-- **Página única:** _"Extraer tablas de la página 3"_
-- **Listas:** _"Procesar páginas 1, 5 y 10"_
-- **Rangos:** _"Obtener datos usando las páginas 2 a la 6"_
+* **Página específica:** "Extraer tablas de la página 3"
+* **Lista de páginas:** "Procesar páginas 1, 5 y 10"
+* **Rango:** "Extraer de la página 2 a la 6"
 
-### Selección por ordinales (Palabras clave)
+### Selección por ordinales
 
-El sistema entiende números ordinales (tanto en español como en inglés):
+El sistema entiende números ordinales:
 
-- _"Extraer la **primera** página y la **última** página"_
-- _"Procesar la **tercera** y **quinta** página"_
-- **Palabras soportadas:** primera, segunda, ..., décima, última (y sus variantes en inglés).
+* "Extraer la **primera** y la **última** página"
+* "Procesar la **tercera** y **quinta** página"
+
+Soporta ordinales en **español e inglés**.
 
 ### Filtrado por documento
 
-Al procesar varios archivos a la vez, puedes dirigir la instrucción a archivos específicos:
+Cuando se cargan varios PDFs:
 
-- _"Extraer página 1 de **Archivo_A.pdf** y la última página de **Archivo_B.pdf**"_
-- _"Extraer tablas de **Doc1**"_ (Esto omitirá otros archivos en la cola de procesamiento)
+* "Extraer página 1 de **ArchivoA.pdf** y la última de **ArchivoB.pdf**"
+* "Extraer tablas solo de **Reporte_2024**"
 
 ---
 
@@ -51,57 +71,109 @@ Al procesar varios archivos a la vez, puedes dirigir la instrucción a archivos 
 
 ```text
 PDF_to_XLSX/
-├── Windows_exec.bat     # Lanzador principal Windows
-├── Linux_exec.sh        # Lanzador principal Linux/macOS
-├── README.md            # Guía rápida
-├── docs/                # Manuales y capturas
+├── Windows_exec.bat      # Lanzador principal para Windows
+├── Linux_exec.sh         # Lanzador para Linux / macOS
+├── README.md             # Guía rápida (Quick Start)
+├── docs/                 # Documentación y capturas
 │   ├── User_guide.md
 │   └── Guia_de_usuario.md
-└── src/                 # Código fuente y activos
-    ├── assets/icons/    # Iconos (pdf_to_excel.png)
-    ├── ui/              # Interfaz
-    ├── logic/           # Lógica de procesamiento
-    ├── main.py          # Punto de entrada GUI
-    ├── cli.py           # Punto de entrada CLI
-    └── api_key.env      # Configuración de Clave API
+└── src/                  # Código fuente (uso interno)
 ```
-
-## 🚀 Inicio rápido
-
-### En Windows
-
-1. Haz doble clic en **`Windows_exec.bat`**.
-2. Instalará dependencias y creará un acceso directo en el escritorio.
-
-### En Linux & macOS
-
-1. Abre una terminal en la carpeta.
-2. Ejecuta: `chmod +x Linux_exec.sh`
-3. Ejecuta: `./Linux_exec.sh`
-4. **Icono de Escritorio**: Tras la primera ejecución, aparecerá en tu menú. En Ubuntu, haz clic derecho en el icono del escritorio y elige **"Permitir lanzar"**.
 
 ---
 
-## 🛠 Modo de uso
+## Instalación y ejecución
 
-### Versión 1: Interfaz Gráfica (GUI)
+### Windows (recomendado)
 
-```bash
-python -m src.main
-```
+1. Descarga el proyecto como ZIP desde GitHub
+2. **Extrae el ZIP** en una carpeta local
+3. Haz doble clic en **`Windows_exec.bat`**
 
-### Versión 2: Línea de Comandos (CLI)
+Durante la primera ejecución, el sistema:
 
-```bash
-python -m src.cli archivo.pdf --output resultados.xlsx
-```
+* Verifica que Python esté instalado
+* Instala automáticamente las dependencias
+* Crea un **acceso directo en el escritorio**
 
-## ⚙️ Configuración
+⏳ La primera vez puede tardar **1 a 3 minutos**.
 
-1. Consigue tu clave en [Google AI Studio](https://aistudio.google.com/api-keys).
-2. Guárdala en la app o edita `src/api_key.env`.
+✅ Al finalizar, la aplicación se abrirá automáticamente.
 
-## 🏗 Detalles técnicos
+---
 
-1. **Renderizado**: `pdfplumber` (300 DPI).
-2. **Consolidación**: Hoja "Summary" seguida de hojas de datos por archivo.
+### 🐧 Linux / 🍎 macOS
+
+1. Abre una terminal en la carpeta del proyecto
+2. Ejecuta:
+
+   ```bash
+   chmod +x Linux_exec.sh
+   ```
+3. Ejecuta:
+
+   ```bash
+   ./Linux_exec.sh
+   ```
+
+---
+
+## Uso de la aplicación (GUI)
+
+1. **Idioma**: Cambia entre Español / Inglés con el botón **EN / ES**
+2. **API Key**: Pega tu clave de Gemini
+3. **Prompt**: Usa el prompt por defecto o personalízalo
+4. **Añadir archivos**: Selecciona uno o varios PDFs
+5. **Ruta de salida**:
+
+   * Por defecto: `extracted_tables/`
+   * Puedes cambiarla si lo deseas
+6. **Formato de salida**:
+
+   * Excel (`.xlsx`)
+   * CSV (`.csv`)
+   * Markdown (`.md`)
+7. Haz clic en **Iniciar extracción**
+
+Al finalizar:
+
+* Aparecerá un mensaje de confirmación
+* Los archivos se guardarán en la ruta seleccionada
+
+---
+
+## 🔑 Configuración de la API Key
+
+1. Obtén tu clave en **Google AI Studio (Gemini)**
+2. Pégala directamente en la aplicación
+
+⚠️ Sin una API Key válida, la extracción no funcionará.
+
+---
+
+## Resultados en Excel
+
+* El archivo Excel generado contiene:
+
+  * Una hoja **"Summary"** con el resumen general
+  * Una hoja adicional por cada PDF procesado
+
+---
+
+## Detalles técnicos (para usuarios avanzados)
+
+* Renderizado de páginas: `pdfplumber` (300 DPI)
+* Procesamiento visual mediante Gemini
+* La aplicación se ejecuta localmente; solo las imágenes se envían a la IA
+
+---
+
+## ❓ Problemas comunes
+
+* **La app no abre** → Asegúrate de haber extraído el ZIP
+* **No se generan archivos** → Revisa que la API Key sea válida
+* **PDF sin tablas** → El documento puede no contener tablas detectables
+
+---
+
+Para más ayuda, consulta la documentación o abre un *issue* en el repositorio.
