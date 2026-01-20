@@ -49,7 +49,7 @@ if !errorlevel! neq 0 (
 
 :: 3. Create Desktop Shortcut (if not exists)
 set "SC_NAME=PDF Table Extractor.lnk"
-set "SC_PATH=%USERPROFILE%\Desktop\%SC_NAME%"
+for /f "usebackq tokens=*" %%D in (`powershell -Command "[Environment]::GetFolderPath('Desktop')"`) do set "SC_PATH=%%D\%SC_NAME%"
 
     echo [*] Ensuring Icon exists...
     !PYTHON_CMD! "%~dp0src\create_ico.py" >nul 2>&1
