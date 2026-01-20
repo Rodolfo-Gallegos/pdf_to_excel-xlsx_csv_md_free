@@ -66,7 +66,8 @@ TEXTS = {
         "fatal_error": "The process encountered a fatal error",
         "quota_error": "The daily API limit has been exceeded (Code 429).",
         "api_leaked": "The API key has been leaked, create a new one (Code 403).",
-        "api_error": "The API key entered is incorrect (Code 400). Please verify it and try again."
+        "api_error": "The API key entered is incorrect (Code 400). Please verify it and try again.",
+        "file_open_error": "The Excel file is currently open. Please close it and try again."
     },
     "ES": {
         "title": "Extractor de Tablas PDF con IA",
@@ -123,6 +124,7 @@ TEXTS = {
         "fatal_error": "El proceso encontró un error fatal",
         "quota_error": "Se ha excedido el límite de la API diario (Código 429).",
         "api_leaked": "La clave API ha sido filtrada, cree una nueva (Código 403).",
-        "api_error": "La clave API ingresada no es correcta (Código 400). Por favor, verifíquela e inténtelo de nuevo."
+        "api_error": "La clave API ingresada no es correcta (Código 400). Por favor, verifíquela e inténtelo de nuevo.",
+        "file_open_error": "El archivo Excel está abierto actualmente. Por favor ciérrelo e intente de nuevo."
     }
 }                   

@@ -325,10 +325,11 @@ class PDFToXLSXGUI:
                 msg = "Ready: API key loaded." if self.lang == "EN" else "Listo: Clave API cargada."
                 self._log(msg)
 
-    def _save_api_key(self):
+    def _save_api_key(self, silent=False):
         key = self.api_key.get().strip()
         if not key:
-            messagebox.showwarning(TEXTS[self.lang]["warning"], TEXTS[self.lang]["no_key"])
+            if not silent:
+                messagebox.showwarning(TEXTS[self.lang]["warning"], TEXTS[self.lang]["no_key"])
             return
         base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) # points to src/
         env_path = os.path.join(base_dir, "api_key.env")
@@ -336,7 +337,9 @@ class PDFToXLSXGUI:
             with open(env_path, "w") as f: f.write(f"API_KEY={key}\n")
         else:
             set_key(env_path, "API_KEY", key)
-        messagebox.showinfo(TEXTS[self.lang]["success"], TEXTS[self.lang]["key_saved"])
+        
+        if not silent:
+            messagebox.showinfo(TEXTS[self.lang]["success"], TEXTS[self.lang]["key_saved"])
         self._log(TEXTS[self.lang]["key_saved"])
 
     def _add_files(self):
@@ -361,6 +364,7 @@ class PDFToXLSXGUI:
             self._log(TEXTS[self.lang]["output_path_set"].format(directory))
 
     def _start_processing(self):
+        self._save_api_key(silent=True)
         key = self.api_key.get().strip()
         if not key:
             messagebox.showerror(TEXTS[self.lang]["error"], TEXTS[self.lang]["no_key"])
@@ -405,12 +409,18 @@ class PDFToXLSXGUI:
             excel_path = os.path.join(out_dir, excel_filename)
             
             writer = None
-            if self.save_excel.get():
-                if os.path.exists(excel_path):
-                    writer = pd.ExcelWriter(excel_path, engine='openpyxl', mode='a', if_sheet_exists='replace')
-                else:
-                    writer = pd.ExcelWriter(excel_path, engine='openpyxl')
-                    pd.DataFrame([["Tables extracted from GUI Application"]]).to_excel(writer, sheet_name="Summary", index=False, header=False)
+            try:
+                if self.save_excel.get():
+                    if os.path.exists(excel_path):
+                        writer = pd.ExcelWriter(excel_path, engine='openpyxl', mode='a', if_sheet_exists='replace')
+                    else:
+                        writer = pd.ExcelWriter(excel_path, engine='openpyxl')
+                        pd.DataFrame([["Tables extracted from GUI Application"]]).to_excel(writer, sheet_name="Summary", index=False, header=False)
+            except PermissionError:
+                self._log(f"ERROR: Permission denied for {excel_filename}. Please close the file.")
+                messagebox.showerror(TEXTS[self.lang]["error"], f"{TEXTS[self.lang]['file_open_error']}\n{excel_filename}")
+                self.root.after(0, lambda: self.start_btn.config(state="normal"))
+                return
 
             tracker = {"has_error": False}
             for i, pdf_path in enumerate(self.pdf_files):
@@ -476,6 +486,7 @@ class PDFToXLSXGUI:
 
             if writer:
                 writer.close()
+                writer = None
                 if not tracker["has_error"]: self._log(f"Results consolidated in EXCEL: {excel_filename}")
 
             if not tracker["has_error"]:
@@ -484,6 +495,10 @@ class PDFToXLSXGUI:
             else:
                 self._log(TEXTS[self.lang]["process_error"])
             
+        except PermissionError:
+            self._log(f"ERROR: Permission denied. The file might be open.")
+            messagebox.showerror(TEXTS[self.lang]["error"], TEXTS[self.lang]["file_open_error"])
+
         except Exception as e:
             self._log(f"CRITICAL ERROR: {e}")
             err_type = "api_error" if "400" in str(e) else "quota_error" if "429" in str(e) else "api_leaked" if "403" in str(e) else "unknown_error"
@@ -492,4 +507,8 @@ class PDFToXLSXGUI:
             else:
                 messagebox.showerror(TEXTS[self.lang]["error"], f"{TEXTS[self.lang]['fatal_error']}: {e}")
         
-        self.root.after(0, lambda: self.start_btn.config(state="normal"))
+        finally:
+            if 'writer' in locals() and writer:
+                try: writer.close()
+                except: pass
+            self.root.after(0, lambda: self.start_btn.config(state="normal"))
