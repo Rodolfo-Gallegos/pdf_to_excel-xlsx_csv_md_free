@@ -168,12 +168,4 @@ Al finalizar:
 
 ---
 
-## ❓ Problemas comunes
-
-* **La app no abre** → Asegúrate de haber extraído el ZIP
-* **No se generan archivos** → Revisa que la API Key sea válida
-* **PDF sin tablas** → El documento puede no contener tablas detectables
-
----
-
 Para más ayuda, consulta la documentación o abre un *issue* en el repositorio.

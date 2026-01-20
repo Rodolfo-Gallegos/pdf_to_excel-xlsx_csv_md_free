@@ -165,12 +165,4 @@ After completion:
 
 ---
 
-## ❓ Common Issues
-
-* **App does not open** → Make sure the ZIP was extracted
-* **No files generated** → Verify that the API Key is valid
-* **PDF has no tables** → The document may not contain detectable tables
-
----
-
 For more help, check the documentation or open an *issue* in the repository.

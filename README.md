@@ -84,7 +84,7 @@ An **AI-powered desktop application** that extracts tables from PDF files (scann
 
 ---
 
-#### **Linux / macOS**
+#### **🐧 Linux / 🍎 macOS**
 
 1. Open a terminal in the extracted folder
 2. Run:
@@ -108,7 +108,7 @@ An **AI-powered desktop application** that extracts tables from PDF files (scann
 
 ---
 
-### 5. Paste your API key
+### 5. Paste your API key 🔑
 
 1. Copy your **Gemini API key**
 2. Paste it into the **API Key** field in the app
