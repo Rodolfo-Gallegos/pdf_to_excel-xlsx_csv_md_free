@@ -1,4 +1,5 @@
 import os
+from src.config import AI_MODEL
 import time
 import re
 import pandas as pd
@@ -148,7 +149,7 @@ def extract_from_page(client: genai.Client, page: Any, prompt: str, log_callback
         for attempt in range(max_retries):
             try:
                 response = client.models.generate_content(
-                    model='gemini-2.5-flash-lite',
+                    model=AI_MODEL,
                     contents=[prompt, img]
                 )
                 if response and hasattr(response, 'text') and response.text:

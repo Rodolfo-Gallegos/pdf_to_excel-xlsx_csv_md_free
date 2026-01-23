@@ -17,7 +17,7 @@ import hashlib
 
 # Modular imports
 from src import config
-from src.config import VERSION, DEFAULT_PROMPT, TEXTS
+from src.config import VERSION, DEFAULT_PROMPT, TEXTS, AI_MODEL
 from src.logic.processor import normalize_df, parse_md, extract_from_page, parse_page_query
 
 class PDFToXLSXGUI:
@@ -408,6 +408,7 @@ class PDFToXLSXGUI:
         
         try:
             client = genai.Client(api_key=key)
+            self._log(f"Using Model: {AI_MODEL}")
             for logger_name in ["google", "google.genai", "urllib3"]:
                 logging.getLogger(logger_name).setLevel(logging.WARNING)
         except Exception as e:

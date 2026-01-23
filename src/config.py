@@ -1,6 +1,7 @@
 import os
 
 VERSION = "1.5.0"
+AI_MODEL = "gemini-2.5-flash-lite"
 
 DEFAULT_PROMPT = """
 Analyze this page and extract ALL tables you see.
