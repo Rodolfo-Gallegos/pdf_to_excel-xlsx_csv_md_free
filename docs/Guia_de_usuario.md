@@ -148,10 +148,44 @@ Al finalizar:
 
 ## 🔑 Configuración de la API Key
 
-1. Obtén tu clave en **Google AI Studio (Gemini)**
-2. Pégala directamente en la aplicación
+1. Consigue tu clave en **[Google AI Studio](https://aistudio.google.com/apikey)**
+2. Pega la clave completa en la aplicación y pulsa **Guardar Clave**
+
+### ¿Sigue siendo gratis?
+
+Sí, para el modelo que usa esta aplicación. `gemini-2.5-flash-lite` se mantiene
+en la capa gratuita, con límites de peticiones por minuto y por día. Si los
+alcanzas, la app muestra el error 429 y puedes continuar al día siguiente: el
+progreso queda en caché y se reanuda desde la última página analizada. Lo que
+salió de la capa gratuita en 2026 fueron los modelos **Pro**, que esta
+aplicación no utiliza.
+
+### El cambio de formato de 2026
+
+Las claves que se generan hoy son *auth keys* y empiezan por `AQ.`. Las
+anteriores empezaban por `AIza` y medían exactamente 39 caracteres, y Google
+las está retirando.
+
+* Claves `AQ.`: formato actual, no hay que hacer nada.
+* Claves `AIza`: la app las sigue aceptando y te muestra un aviso. Genera una
+  nueva cuando dejen de funcionar.
+
+La aplicación solo comprueba que la clave no esté vacía y que no tenga espacios
+ni saltos de línea. Ya no valida la longitud, así que un futuro cambio de
+formato no te dejará fuera.
+
+### Errores frecuentes
+
+| Código | Significado | Solución |
+| :--- | :--- | :--- |
+| 400 | La clave fue rechazada | Comprueba que la copiaste completa. Si empieza por `AIza`, genera una nueva. |
+| 403 | La clave fue bloqueada | Normalmente por publicarla en algún sitio público, o por ser una clave estándar ya retirada. Genera una nueva. |
+| 429 | Límite diario o por minuto alcanzado | Espera y reanuda. La caché conserva tu progreso. |
 
 ⚠️ Sin una API Key válida, la extracción no funcionará.
+
+🔒 La clave se guarda localmente en `src/api_key.env` y nunca sale de tu equipo.
+Nunca subas ese archivo a un repositorio ni compartas la clave.
 
 ---
 

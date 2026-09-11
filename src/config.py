@@ -1,6 +1,6 @@
 import os
 
-VERSION = "1.5.0"
+VERSION = "1.6.0"
 AI_MODEL = "gemini-2.5-flash-lite"
 
 DEFAULT_PROMPT = """
@@ -49,7 +49,8 @@ TEXTS = {
         "error": "Error",
         "key_saved": "API Key saved to api_key.env",
         "no_key": "Gemini API Key is required.",
-        "key_length": "Incorrect API Key length. The key must be 39 characters long.",
+        "key_malformed": "That does not look like an API key. Copy the whole key from Google AI Studio, with no spaces or line breaks.",
+        "key_legacy": "This key uses the old format (AIza...). Google is retiring these keys and the Gemini API will stop accepting them. It may still work today, but if it fails, generate a new one at aistudio.google.com/apikey.",
         "no_files": "Please add at least one PDF file.",
         "process_finished": "Process Finished",
         "process_success": "The extraction process has completed successfully!",
@@ -66,8 +67,8 @@ TEXTS = {
         "output_path_set": "Output path: {}",
         "fatal_error": "The process encountered a fatal error",
         "quota_error": "The daily API limit has been exceeded (Code 429).",
-        "api_leaked": "The API key has been leaked, create a new one (Code 403).",
-        "api_error": "The API key entered is incorrect (Code 400). Please verify it and try again.",
+        "api_leaked": "The key was blocked (Code 403). This usually means it was published somewhere public, or it is a retired standard key. Generate a new one at aistudio.google.com/apikey.",
+        "api_error": "The API key was rejected (Code 400). If your key starts with AIza it is the retired format: generate a new one at aistudio.google.com/apikey.",
         "file_open_error": "The Excel file is currently open. Please close it and try again."
     },
     "ES": {
@@ -107,7 +108,8 @@ TEXTS = {
         "error": "Error",
         "key_saved": "Clave API guardada en api_key.env",
         "no_key": "Se requiere la clave API de Gemini.",
-        "key_length": "Longitud de API incorrecta. La clave debe tener 39 caracteres.",
+        "key_malformed": "Eso no parece una clave API. Copia la clave completa desde Google AI Studio, sin espacios ni saltos de línea.",
+        "key_legacy": "Esta clave usa el formato antiguo (AIza...). Google está retirando estas claves y la API de Gemini dejará de aceptarlas. Puede que hoy siga funcionando, pero si falla, genera una nueva en aistudio.google.com/apikey.",
         "no_files": "Por favor, añade al menos un archivo PDF.",
         "process_finished": "Proceso Finalizado",
         "process_success": "¡El proceso de extracción ha finalizado con éxito!",
@@ -124,8 +126,8 @@ TEXTS = {
         "output_path_set": "Ruta de salida: {}",
         "fatal_error": "El proceso encontró un error fatal",
         "quota_error": "Se ha excedido el límite de la API diario (Código 429).",
-        "api_leaked": "La clave API ha sido filtrada, cree una nueva (Código 403).",
-        "api_error": "La clave API ingresada no es correcta (Código 400). Por favor, verifíquela e inténtelo de nuevo.",
+        "api_leaked": "La clave fue bloqueada (Código 403). Suele significar que se publicó en algún sitio público, o que es una clave estándar ya retirada. Genera una nueva en aistudio.google.com/apikey.",
+        "api_error": "La clave API fue rechazada (Código 400). Si tu clave empieza por AIza, es el formato retirado: genera una nueva en aistudio.google.com/apikey.",
         "file_open_error": "El archivo Excel está abierto actualmente. Por favor ciérrelo e intente de nuevo."
     }
 }                   

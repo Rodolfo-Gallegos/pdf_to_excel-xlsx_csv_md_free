@@ -17,6 +17,7 @@ import hashlib
 
 # Modular imports
 from src import config
+from src.logic.api_key import check_key, EMPTY, LEGACY, MALFORMED
 from src.config import VERSION, DEFAULT_PROMPT, TEXTS, AI_MODEL
 from src.logic.processor import normalize_df, parse_md, extract_from_page, parse_page_query
 
@@ -35,6 +36,7 @@ class PDFToXLSXGUI:
 
         self.pdf_files = []
         self.api_key = tk.StringVar()
+        self._legacy_key_warned = False
         
         # Default output directory: extracted_tables in the current working directory
         default_out = os.path.join(os.getcwd(), "extracted_tables")
@@ -368,12 +370,22 @@ class PDFToXLSXGUI:
     def _start_processing(self):
         self._save_api_key(silent=True)
         key = self.api_key.get().strip()
-        if not key:
+
+        status = check_key(key)
+        if status == EMPTY:
             messagebox.showerror(TEXTS[self.lang]["error"], TEXTS[self.lang]["no_key"])
             return
-        if len(key) != 39:
-            messagebox.showwarning(TEXTS[self.lang]["error"], TEXTS[self.lang]["key_length"])
+        if status == MALFORMED:
+            messagebox.showwarning(TEXTS[self.lang]["error"], TEXTS[self.lang]["key_malformed"])
             return
+        if status == LEGACY and not self._legacy_key_warned:
+            # A warning, not a wall: these keys still work for some users
+            # until Google finishes retiring them, and blocking here would
+            # break the app for anyone who has not migrated yet.
+            messagebox.showwarning(TEXTS[self.lang]["warning"], TEXTS[self.lang]["key_legacy"])
+            self._log(TEXTS[self.lang]["key_legacy"])
+            self._legacy_key_warned = True
+
         if not self.pdf_files:
             messagebox.showerror(TEXTS[self.lang]["error"], TEXTS[self.lang]["no_files"])
             return

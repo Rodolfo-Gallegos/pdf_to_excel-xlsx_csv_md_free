@@ -142,10 +142,42 @@ After completion:
 
 ## 🔑 API Key Configuration
 
-1. Obtain your key from **Google AI Studio (Gemini)**
-2. Paste it directly into the application
+1. Get a key at **[Google AI Studio](https://aistudio.google.com/apikey)**
+2. Paste the whole key into the application and click **Save Key**
+
+### Is it free?
+
+Yes, for the model this app uses. `gemini-2.5-flash-lite` stays on the free
+tier, with daily and per-minute request limits. If you hit them, the app
+reports error 429 and you can continue the next day: progress is cached, so it
+resumes from the last analyzed page. The **Pro** models left the free tier in
+2026, but this app does not use them.
+
+### The 2026 key format change
+
+Keys issued today are *auth keys* and start with `AQ.`. The older keys started
+with `AIza` and were exactly 39 characters long, and Google is retiring them.
+
+* `AQ.` keys: current format, nothing to do.
+* `AIza` keys: still accepted by the app, which shows a warning. Generate a new
+  key when they stop working.
+
+The app validates only that the key is not empty and has no spaces or line
+breaks. It does not check the length, so a future format change will not lock
+you out.
+
+### Common errors
+
+| Code | Meaning | Fix |
+| :--- | :--- | :--- |
+| 400 | The key was rejected | Check you copied it whole. If it starts with `AIza`, generate a new one. |
+| 403 | The key was blocked | Usually a key published somewhere public, or a retired standard key. Generate a new one. |
+| 429 | Daily or per-minute limit reached | Wait and resume. The cache keeps your progress. |
 
 ⚠️ Without a valid API Key, extraction will not work.
+
+🔒 The key is saved locally in `src/api_key.env` and never leaves your machine.
+Never commit that file or share the key.
 
 ---
 

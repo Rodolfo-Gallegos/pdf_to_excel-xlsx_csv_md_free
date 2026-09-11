@@ -114,14 +114,30 @@ An **AI-powered desktop application** that extracts tables from PDF files (scann
 
 ### 5. Paste your API key 🔑
 
-1. Copy your **Gemini API key**
-2. Paste it into the **API Key** field in the app
+1. Get a key at **[Google AI Studio](https://aistudio.google.com/apikey)** (sign in with a Google account, click **Get API key**)
+2. Copy the whole key and paste it into the **API Key** field in the app
 
-You can obtain an API key from:
+**Is it still free?** Yes, for the model this app uses. `gemini-2.5-flash-lite`
+stays on the free tier, with daily and per-minute request limits. What Google
+removed from the free tier in 2026 were the **Pro** models, which this app does
+not use. No credit card is needed.
 
-* Google AI Studio (Gemini)
+**Key format changed in 2026.** New keys issued by AI Studio are *auth keys*
+and start with `AQ.`, replacing the old `AIza` keys, which were 39 characters
+long. The Gemini API is retiring the old ones, so:
+
+* If your key starts with `AQ.` you are on the current format.
+* If it starts with `AIza` the app still accepts it and will warn you. When it
+  stops working, generate a new key at the link above.
+
+The app no longer checks the key against a fixed length, so any future format
+Google introduces keeps working.
 
 ⚠️ Without an API key, extraction will not work.
+
+🔒 Your key is stored locally in `src/api_key.env` and never leaves your
+machine. Do not commit that file or paste the key anywhere public: a published
+key gets revoked by Google (error 403).
 
 ---
 
